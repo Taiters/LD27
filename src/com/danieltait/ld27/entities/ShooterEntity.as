@@ -1,12 +1,14 @@
 package com.danieltait.ld27.entities 
 {
+	import com.danieltait.ld27.worlds.GameWorld;
 	import net.flashpunk.Entity;
 	import net.flashpunk.FP;
 	
 	public class ShooterEntity extends Entity
 	{
-		protected var lastFire = 1;
-		protected var fireRate;
+		protected var lastFire:Number = 1;
+		protected var fireRate:Number;
+		protected var health:int;
 		
 		public function getAngle():Number { return null; }
 		
@@ -19,6 +21,12 @@ package com.danieltait.ld27.entities
 			var bullet:Bullet = new Bullet(spawnX, spawnY, 400, direction, rDirection, this);
 			FP.world.add(bullet);
 			lastFire = 0;
+		}
+		
+		public function hit(b:Bullet):void 
+		{
+			health -= b.getDamage();
+			(world as GameWorld).emit(GameWorld.BLOOD, this.x, this.y);
 		}
 		
 	}

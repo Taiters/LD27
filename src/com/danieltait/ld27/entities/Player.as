@@ -22,6 +22,7 @@ package com.danieltait.ld27.entities
 		
 		private var shot:Boolean = false;
 		
+		private var flashBackTime:Number;
 		private var flashbackFrames:Array;
 		private var doingFlashback:Boolean = false;
 		private var flashBackFrameIndex:int = 0;
@@ -34,6 +35,7 @@ package com.danieltait.ld27.entities
 			
 			this.setHitbox(image.width, image.height);
 			this.type = "Player";
+			this.name = "Player";
 			this.centerOrigin();
 			Input.define("Up", Key.W, Key.UP);
 			Input.define("Down", Key.S, Key.DOWN);
@@ -68,6 +70,19 @@ package com.danieltait.ld27.entities
 		override public function getAngle():Number
 		{
 			return this.image.angle;
+		}
+		
+		public function isInFlashback():Boolean
+		{
+			return doingFlashback;
+		}
+		
+		public function getFlashbackTime():Number
+		{
+			if (doingFlashback && flashbackFrames[flashBackFrameIndex]) {
+				return flashBackTime - flashbackFrames[flashBackFrameIndex].timestamp;
+			}
+			return null;
 		}
 		
 		private function handleInput() {
@@ -130,8 +145,6 @@ package com.danieltait.ld27.entities
 			yVel = (yVel > maxSpeed) ? maxSpeed : (yVel < -maxSpeed) ? -maxSpeed : yVel;
 			
 			
-			
-			
 		}
 		
 		private function handleCollisions():void 
@@ -142,15 +155,18 @@ package com.danieltait.ld27.entities
 			
 			for ( var i:int = 0; i < Math.abs(xd); i++) {
 				var sxd:int = FP.sign(xd);
-				if (!collide("Map", x + sxd, y)) {
+				if (!collide("Map", x + sxd, y)
+					&& !collide("Enemy", x + sxd, y)) {
 					x += sxd;
 				}
 				else {
-					if (!collide("Map", x + sxd, y + 1)) {
+					if (!collide("Map", x + sxd, y + 1)
+						&& !collide("Enemy", x + sxd, y +1)) {
 						x += sxd;
 						y += 1;
 					}
-					else if (!collide("Map", x + sxd, y - 1)) {
+					else if (!collide("Map", x + sxd, y - 1)
+						&& !collide("Enemy", x + sxd, y - 1)) {
 						x += sxd;
 						y -= 1;
 					}
@@ -162,15 +178,18 @@ package com.danieltait.ld27.entities
 			
 			for (var i:int = 0; i < Math.abs(yd); i++) {
 				var syd:int = FP.sign(yd);
-				if (!collide("Map", x, y + FP.sign(yd))) {
+				if (!collide("Map", x, y + syd)
+					&& !collide("Enemy", x , y + syd)) {
 					y += syd;
 				}
 				else {
-					if (!collide("Map", x + 1, y + syd)) {
+					if (!collide("Map", x + 1, y + syd)
+						&& !collide("Enemy", x + 1, y + syd)) {
 						y += syd;
 						x += 1;
 					}
-					else if (!collide("Map", x - 1, y + syd)) {
+					else if (!collide("Map", x - 1, y + syd)
+						&& !collide("Enemy", x - 1, y + syd)) {
 						y += syd;
 						x -= 1;
 					}
@@ -218,6 +237,8 @@ package com.danieltait.ld27.entities
 				this.shadow.reset();
 				doingFlashback = true;
 				updateFlashback();
+				var date:Date = new Date;
+				flashBackTime = date.time;
 			}
 		}
 		

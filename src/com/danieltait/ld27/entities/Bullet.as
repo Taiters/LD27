@@ -1,5 +1,6 @@
 package com.danieltait.ld27.entities 
 {
+	import com.danieltait.ld27.worlds.GameWorld;
 	import net.flashpunk.Entity;
 	import net.flashpunk.graphics.Image;
 	import net.flashpunk.FP;
@@ -12,13 +13,15 @@ package com.danieltait.ld27.entities
 	{
 		private var image:Image;
 		
+		private var damage:int;
+		
 		private var xVel:Number;
 		private var yVel:Number;
 		private var direction:Number;
 		
 		private var shotBy:ShooterEntity;
 		
-		public function Bullet(x:Number, y:Number, vel:Number, direction:Number, rDirection:Number, shotBy:ShooterEntity) 
+		public function Bullet(x:Number, y:Number, vel:Number, direction:Number, rDirection:Number, shotBy:ShooterEntity, damage:int = 34) 
 		{
 			this.image = new Image(Resources.BULLET);
 			this.image.centerOO();
@@ -31,6 +34,7 @@ package com.danieltait.ld27.entities
 			this.xVel = vel * Math.cos(rDirection);
 			this.yVel = vel * Math.sin(rDirection);
 			this.image.angle = direction;
+			this.damage = damage;
 			this.shotBy = shotBy;
 		}
 		
@@ -48,7 +52,14 @@ package com.danieltait.ld27.entities
 		
 		private function handleCollisions():void
 		{
+			var e:Entity;
 			if (collide("Map", x, y)) {
+				(world as GameWorld).emit(GameWorld.EXPLOSION, this.x, this.y);
+				explode();
+			}
+			else if ((e = collide("Enemy", x, y))) {
+				var enemy:Enemy = e as Enemy;
+				enemy.hit(this);
 				explode();
 			}
 		}
@@ -61,7 +72,11 @@ package com.danieltait.ld27.entities
 		override public function render():void
 		{
 			super.render();
-			Draw.hitbox(this);
+		}
+		
+		public function getDamage():int
+		{
+			return damage;
 		}
 		
 		
