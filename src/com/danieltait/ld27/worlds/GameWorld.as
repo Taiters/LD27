@@ -11,7 +11,9 @@ package com .danieltait.ld27.worlds
 	import flash.display.BitmapData;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import net.flashpunk.Entity;
 	import net.flashpunk.graphics.Canvas;
+	import net.flashpunk.graphics.Emitter;
 	import net.flashpunk.World;
 	import net.flashpunk.FP;
 	/**
@@ -21,15 +23,38 @@ package com .danieltait.ld27.worlds
 	public class GameWorld extends World
 	{
 		private var level:Level;
+		
+		public static const EXPLOSION:String = "explosion";
+		
+		protected var emitter:Emitter;
+		
 		public function GameWorld() 
 		{
 			level = LevelBuilder.buildLevel(Resources.TEST_LEVEL, this);
+			
+			emitter = new Emitter(Resources.BULLET, 5, 5);
+			emitter.relative = false;
+			emitter.newType(EXPLOSION, [0]);
+			emitter.setMotion(EXPLOSION, 0, 50, 0.2, 360, 25, 0.2);
+			emitter.setColor(EXPLOSION, 0xFFFFFFFF, 0x00FFFFFF);
+			
+			addGraphic(emitter);
 		}
 		
 		override public function update():void 
 		{
 			super.update();
 			level.getCamera().update();
+		}
+		
+		override public function remove(e:Entity):Entity
+		{
+			if (e.type == "Bullet") {
+				for ( var i:int = 0; i < 10; i++) {
+					emitter.emit(EXPLOSION, e.x, e.y);
+				}
+			}
+			return super.remove(e);
 		}
 		
 	}

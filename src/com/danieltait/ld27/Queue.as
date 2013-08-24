@@ -10,7 +10,8 @@ package com.danieltait.ld27
 
 			public function write(d:*):void 
 			{ 
-				q[q.length] = d; l++; }
+				q[q.length] = d; l++; 
+			}
 
 			public function read():* 
 			{

@@ -49,7 +49,6 @@ package com.danieltait.ld27.entities
 		override public function render():void
 		{
 			super.render();
-			Draw.hitbox(this);
 		}
 		
 		override public function update():void
@@ -135,12 +134,55 @@ package com.danieltait.ld27.entities
 			
 		}
 		
-		private function handleCollisions() {
-			x += xVel * FP.elapsed;
-			y += yVel * FP.elapsed;
+		private function handleCollisions():void 
+		{
+			var xd:Number = xVel * FP.elapsed;
+			var yd:Number = yVel * FP.elapsed;
+			
+			
+			for ( var i:int = 0; i < Math.abs(xd); i++) {
+				var sxd:int = FP.sign(xd);
+				if (!collide("Map", x + sxd, y)) {
+					x += sxd;
+				}
+				else {
+					if (!collide("Map", x + sxd, y + 1)) {
+						x += sxd;
+						y += 1;
+					}
+					else if (!collide("Map", x + sxd, y - 1)) {
+						x += sxd;
+						y -= 1;
+					}
+					else {
+						break;
+					}
+				}
+			}
+			
+			for (var i:int = 0; i < Math.abs(yd); i++) {
+				var syd:int = FP.sign(yd);
+				if (!collide("Map", x, y + FP.sign(yd))) {
+					y += syd;
+				}
+				else {
+					if (!collide("Map", x + 1, y + syd)) {
+						y += syd;
+						x += 1;
+					}
+					else if (!collide("Map", x - 1, y + syd)) {
+						y += syd;
+						x -= 1;
+					}
+					else {
+						break;
+					}
+				}
+			}
 		}
 		
-		private function handleAiming() {
+		private function handleAiming():void 
+		{
 			var mouseX:Number = Input.mouseX + world.camera.x;
 			var mouseY:Number = Input.mouseY + world.camera.y;
 			

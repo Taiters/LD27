@@ -3,6 +3,8 @@ package com.danieltait.ld27.entities
 	import net.flashpunk.Entity;
 	import net.flashpunk.graphics.Image;
 	import net.flashpunk.FP;
+	import net.flashpunk.graphics.Emitter;
+	import net.flashpunk.utils.Draw;
 	
 	import com.danieltait.ld27.Resources;
 	
@@ -21,6 +23,8 @@ package com.danieltait.ld27.entities
 			this.image = new Image(Resources.BULLET);
 			this.image.centerOO();
 			this.graphic = image;
+			this.setHitbox(image.width, image.height);
+			this.type = "Bullet";
 			this.centerOrigin();
 			this.x = x;
 			this.y = y;
@@ -32,9 +36,34 @@ package com.danieltait.ld27.entities
 		
 		override public function update():void 
 		{
+			move();
+			handleCollisions();
+		}
+		
+		private function move():void
+		{
 			this.x += xVel * FP.elapsed;
 			this.y += yVel * FP.elapsed;
 		}
+		
+		private function handleCollisions():void
+		{
+			if (collide("Map", x, y)) {
+				explode();
+			}
+		}
+		
+		private function explode():void
+		{
+			world.remove(this);
+		}
+		
+		override public function render():void
+		{
+			super.render();
+			Draw.hitbox(this);
+		}
+		
 		
 	}
 

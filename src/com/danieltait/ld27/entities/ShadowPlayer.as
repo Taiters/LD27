@@ -10,13 +10,16 @@ package com.danieltait.ld27.entities
 	public class ShadowPlayer extends ShooterEntity
 	{
 		private var dataQueue:Queue;
-		var image:Image;
-		var exists:Boolean = false;
+		private var image:Image;
+		private var exists:Boolean = false;
+		
+		private var currentFrame:PlayerData;
+		
 		public function ShadowPlayer() 
 		{
 			image = new Image(Resources.PLAYER);
 			image.centerOO();
-			image.alpha = 0.5;
+			image.alpha = 1;
 			this.graphic = image;
 			this.centerOrigin();
 			
@@ -34,16 +37,14 @@ package com.danieltait.ld27.entities
 		{
 			dataQueue.reset();
 			this.exists = false;
+			this.visible = false;
 		}
 		
 		public function getFrame():PlayerData
 		{
 			
-			var data:PlayerData = dataQueue.peek();
-			var date:Date = new Date();
-			var timestamp:Number = date.time;
-			if (timestamp - 10000 > data.timestamp) {
-				return data;
+			if (currentFrame) {
+				return currentFrame;
 			}
 			return null;
 		}
@@ -55,11 +56,7 @@ package com.danieltait.ld27.entities
 		
 		public function getFlashbackFrames():Array
 		{
-			var data:PlayerData = dataQueue.peek();
-			var date:Date = new Date();
-			var timestamp:Number = date.time;
-			trace(timestamp - data.timestamp);
-			if (timestamp - 10000 > data.timestamp) {
+			if(currentFrame) {
 				return dataQueue.getContents().reverse();
 			}
 			return null;
@@ -83,21 +80,20 @@ package com.danieltait.ld27.entities
 					var date:Date = new Date();
 					var timestamp:Number = date.time;
 					if (timestamp - 10000 > data.timestamp) {
-						data = dataQueue.read();
-						this.x = data.x;
-						this.y = data.y;
-						this.image.angle = data.direction;
-						if(exists) {
+						currentFrame = dataQueue.read();
+						if (exists) {
+							
+							this.x = data.x;
+							this.y = data.y;
+							this.image.angle = data.direction;
 							if (data.shot) {
 								shoot();
 							}
-							this.image.alpha = 1;
+							this.visible = true;
 						}
 						else {
-							this.image.alpha = 0.25;
+							this.visible = false
 						}
-						
-						this.visible = true;
 					}
 					else {
 						this.visible = false;

@@ -20,10 +20,12 @@ package com.danieltait.ld27
 		
 		public static function buildLevel(levelFile:Class, world:World):Level
 		{
-			var bitmap:BitmapData = new BitmapData(1280, 960, true, 0x00000000);
-			Draw.setTarget(bitmap);
+			
 			var bytes:ByteArray = new levelFile;
 			var xml:XML = new XML(bytes.readUTFBytes(bytes.length));
+			
+			var bitmap:BitmapData = new BitmapData(xml.@width, xml.@height, true, 0x00000000);
+			Draw.setTarget(bitmap);
 			
 			for (var i:int = 0; i < xml.Bounds.Nodes.length(); i++) {
 				drawNodeSet(xml.Bounds.Nodes[i].node);
