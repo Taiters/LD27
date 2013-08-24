@@ -11,6 +11,7 @@ package com.danieltait.ld27.entities
 	{
 		private var dataQueue:Queue;
 		var image:Image;
+		var exists:Boolean = false;
 		public function ShadowPlayer() 
 		{
 			image = new Image(Resources.PLAYER);
@@ -24,9 +25,15 @@ package com.danieltait.ld27.entities
 			this.visible = false;
 		}
 		
+		public function setExists(exists:Boolean):void
+		{
+			this.exists = exists;
+		}
+		
 		public function reset():void 
 		{
 			dataQueue.reset();
+			this.exists = false;
 		}
 		
 		public function getFrame():PlayerData
@@ -44,6 +51,18 @@ package com.danieltait.ld27.entities
 		public function addData(data:PlayerData)
 		{
 			dataQueue.write(data);
+		}
+		
+		public function getFlashbackFrames():Array
+		{
+			var data:PlayerData = dataQueue.peek();
+			var date:Date = new Date();
+			var timestamp:Number = date.time;
+			trace(timestamp - data.timestamp);
+			if (timestamp - 10000 > data.timestamp) {
+				return dataQueue.getContents().reverse();
+			}
+			return null;
 		}
 		
 		override public function update():void
@@ -64,14 +83,21 @@ package com.danieltait.ld27.entities
 					var date:Date = new Date();
 					var timestamp:Number = date.time;
 					if (timestamp - 10000 > data.timestamp) {
-						this.visible = true;
 						data = dataQueue.read();
 						this.x = data.x;
 						this.y = data.y;
 						this.image.angle = data.direction;
-						if (data.shot) {
-							shoot();
+						if(exists) {
+							if (data.shot) {
+								shoot();
+							}
+							this.image.alpha = 1;
 						}
+						else {
+							this.image.alpha = 0.25;
+						}
+						
+						this.visible = true;
 					}
 					else {
 						this.visible = false;

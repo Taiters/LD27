@@ -11,22 +11,29 @@ package com.danieltait.ld27.entities
 	
 	public class Player extends ShooterEntity
 	{
-		var xVel:Number = 0;
-		var yVel:Number = 0;
-		var acc:Number = 50;
-		var maxSpeed:Number = 300;
+		private var xVel:Number = 0;
+		private var yVel:Number = 0;
+		private var acc:Number = 50;
+		private var maxSpeed:Number = 300;
 		
-		var image:Image;
+		private var image:Image;
 		
-		var shadow:ShadowPlayer;
+		private var shadow:ShadowPlayer;
 		
-		var shot:Boolean = false;
+		private var shot:Boolean = false;
 		
-		public function Player(shadow) 
+		private var flashbackFrames:Array;
+		private var doingFlashback:Boolean = false;
+		private var flashBackFrameIndex:int = 0;
+		
+		public function Player(shadow:ShadowPlayer) 
 		{
 			image = new Image(Resources.PLAYER);
 			image.centerOO();
 			this.graphic = image;
+			
+			this.setHitbox(image.width, image.height);
+			this.type = "Player";
 			this.centerOrigin();
 			Input.define("Up", Key.W, Key.UP);
 			Input.define("Down", Key.S, Key.DOWN);
@@ -42,13 +49,21 @@ package com.danieltait.ld27.entities
 		override public function render():void
 		{
 			super.render();
+			Draw.hitbox(this);
 		}
 		
 		override public function update():void
 		{
-			shot = false;
-			handleInput();
-			writeShadowData();
+			if (doingFlashback) {
+				updateFlashback();
+			}
+			else {
+				shot = false;
+				handleInput();
+				handleCollisions();
+				handleAiming();
+				writeShadowData();
+			}
 		}
 		
 		override public function getAngle():Number
@@ -58,8 +73,17 @@ package com.danieltait.ld27.entities
 		
 		private function handleInput() {
 			
-			if (Input.check("Flashback")) {
-				flashback();
+			if (Input.pressed("Flashback")) {
+				if (flashback()) {
+					return;
+				}
+			}
+			
+			if (Input.check(Key.L)) {
+				this.shadow.setExists(true);
+			}
+			if (Input.check(Key.K)) {
+				this.shadow.setExists(false);
 			}
 			
 			if (Input.check("Up")) {
@@ -106,11 +130,19 @@ package com.danieltait.ld27.entities
 			xVel = (xVel > maxSpeed) ? maxSpeed : (xVel < -maxSpeed) ? -maxSpeed : xVel;
 			yVel = (yVel > maxSpeed) ? maxSpeed : (yVel < -maxSpeed) ? -maxSpeed : yVel;
 			
+			
+			
+			
+		}
+		
+		private function handleCollisions() {
 			x += xVel * FP.elapsed;
 			y += yVel * FP.elapsed;
-			
-			var mouseX = Input.mouseX;
-			var mouseY = Input.mouseY;
+		}
+		
+		private function handleAiming() {
+			var mouseX:Number = Input.mouseX + world.camera.x;
+			var mouseY:Number = Input.mouseY + world.camera.y;
 			
 			var angle = Math.atan2(mouseX - x, mouseY - y);
 			image.angle  = (angle) * (180 / Math.PI) + 180;
@@ -120,30 +152,53 @@ package com.danieltait.ld27.entities
 				shoot();
 				shot = true;
 			}
-			
 		}
 		
 		private function writeShadowData() {
-			var date:Date = new Date;
-			var timestamp:Number = date.time;
-			
-			var data:PlayerData = new PlayerData;
-			data.x = this.x;
-			data.y = this.y;
-			data.direction = image.angle;
-			data.timestamp = timestamp;
-			data.shot = shot;
-			this.shadow.addData(data);
+			if(!doingFlashback) {
+				var date:Date = new Date;
+				var timestamp:Number = date.time;
+				
+				var data:PlayerData = new PlayerData;
+				data.x = this.x;
+				data.y = this.y;
+				data.direction = image.angle;
+				data.timestamp = timestamp;
+				data.shot = shot;
+				this.shadow.addData(data);
+			}
 		}
 		
 		private function flashback():void 
 		{
-			var frame:PlayerData = this.shadow.getFrame();
-			if (frame) {
-				this.x = frame.x;
-				this.y = frame.y;
-				this.image.angle = frame.direction;
+			flashbackFrames = this.shadow.getFlashbackFrames();
+			if (flashbackFrames) {
 				this.shadow.reset();
+				doingFlashback = true;
+				updateFlashback();
+			}
+		}
+		
+		private function updateFlashback():void
+		{
+			if (flashBackFrameIndex < flashbackFrames.length) {
+				setData(flashbackFrames[flashBackFrameIndex], false);
+				flashBackFrameIndex += 3;
+			}
+			else {
+				flashBackFrameIndex = 0;
+				flashbackFrames = null;
+				doingFlashback = false;
+			}
+		}
+		
+		private function setData(data:PlayerData, shoot:Boolean):void
+		{
+			this.x = data.x;
+			this.y = data.y;
+			this.image.angle = data.direction;
+			if (shoot && data.shot) {
+				this.shoot();
 			}
 		}
 		

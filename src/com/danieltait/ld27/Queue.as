@@ -40,9 +40,9 @@ package com.danieltait.ld27
 				return (isEmpty) ? null : q[0];
 			}
 			
-			public function getContents():*
+			public function getContents():Array
 			{
-				return q;
+				return q.slice();
 			}
     }
 }
