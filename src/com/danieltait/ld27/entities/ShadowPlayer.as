@@ -38,7 +38,6 @@ package com.danieltait.ld27.entities
 			dataQueue.reset();
 			this.exists = false;
 			this.visible = false;
-			this.currentFrame = null;
 		}
 		
 		public function getFrame():PlayerData
@@ -76,6 +75,8 @@ package com.danieltait.ld27.entities
 		private function updateData():void
 		{
 			if (!dataQueue.isEmpty) {
+				currentFrame = dataQueue.peek();
+				/*
 				var data:PlayerData = dataQueue.peek();
 				if (data) {
 					var date:Date = new Date();
@@ -100,6 +101,7 @@ package com.danieltait.ld27.entities
 						this.visible = false;
 					}
 				}
+				*/
 			}
 		}
 		

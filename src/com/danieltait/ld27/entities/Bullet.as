@@ -22,7 +22,7 @@ package com.danieltait.ld27.entities
 		public var yVel:Number;
 		public var force:int;
 		
-		public function Bullet(x:Number, y:Number, vel:Number, direction:Number, rDirection:Number, shotBy:ShooterEntity, damage:int = 34, force:int = 2) 
+		public function Bullet(x:Number, y:Number, vel:Number, direction:Number, rDirection:Number, shotBy:ShooterEntity, damage:int = 34, force:int = 4) 
 		{
 			this.image = new Image(Resources.PARTICLE);
 			this.image.color = 0x35FF75;
@@ -39,6 +39,11 @@ package com.danieltait.ld27.entities
 			this.damage = damage;
 			this.shotBy = shotBy;
 			this.force = force;
+		}
+		
+		public function shooter():ShooterEntity
+		{
+			return shotBy;
 		}
 		
 		override public function update():void 

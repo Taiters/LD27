@@ -1,14 +1,17 @@
 package com.danieltait.ld27.entities 
 {
 	import com.danieltait.ld27.PlayerData;
+	import com.danieltait.ld27.worlds.GameWorld;
 	import net.flashpunk.Entity;
 	import net.flashpunk.graphics.Canvas;
 	import net.flashpunk.graphics.Image;
+	import net.flashpunk.Sfx;
 	import net.flashpunk.utils.Input;
 	import net.flashpunk.utils.Key;
 	import net.flashpunk.FP;
 	import net.flashpunk.utils.Draw;
 	import com.danieltait.ld27.Resources;
+	import com.danieltait.ld27.AudioManager;
 	
 	public class Player extends ShooterEntity
 	{
@@ -30,6 +33,9 @@ package com.danieltait.ld27.entities
 		private var flashbackFrames:Array;
 		private var doingFlashback:Boolean = false;
 		private var flashBackFrameIndex:int = 0;
+		
+		private var timeBonus:Number = 0;
+		
 		
 		public function Player(shadow:ShadowPlayer) 
 		{
@@ -54,6 +60,7 @@ package com.danieltait.ld27.entities
 			
 			this.vel = 0;
 			this.dir = 0;
+			
 		}
 		
 		override public function render():void
@@ -87,28 +94,37 @@ package com.danieltait.ld27.entities
 		
 		public function getFlashbackTime():Number
 		{
+			if (doingFlashback) {
+				return flashBackTime;
+			}
+			return null;
+		}
+		
+		public function getFlashbackTimeTaken():Number
+		{
 			if (doingFlashback && flashbackFrames[flashBackFrameIndex]) {
 				return flashBackTime - flashbackFrames[flashBackFrameIndex].timestamp;
 			}
 			return null;
 		}
 		
+		public function getHistoryTime():Number
+		{
+			if(shadow.getFrame()) {
+				var date:Date = new Date;
+				var timestamp:Number = date.time;
+				return timestamp - shadow.getFrame().timestamp - timeBonus;
+			}
+			return null;
+		}
+		
+		public function getStartTime():Number
+		{
+			return shadow.getFrame().timestamp;
+		}
+		
 		private function handleInput():void
 		{
-			
-			if (Input.pressed("Flashback")) {
-				if (flashback()) {
-					return;
-				}
-			}
-			
-			if (Input.check(Key.L)) {
-				this.shadow.setExists(true);
-			}
-			if (Input.check(Key.K)) {
-				this.shadow.setExists(false);
-			}
-			
 			var xVel:Number = Math.cos(dir) * vel;
 			var yVel:Number = Math.sin(dir) * vel;
 			
@@ -161,6 +177,23 @@ package com.danieltait.ld27.entities
 		
 		private function handleCollisions():void 
 		{
+			var fbp:FlashbackPoint;
+			if (( fbp = (collide("FlashbackPoint", x, y) as FlashbackPoint))) {
+				if (flashback()) {
+					(world as GameWorld).emit(GameWorld.EXPLOSION, fbp.x, fbp.y, 30);
+					world.remove(fbp);
+					addScore(100);
+					return;
+				}
+			}
+			
+			var tb:TimeBonus;
+			if (( tb = (collide("TimeBonus", x, y) as TimeBonus))) {
+				(world as GameWorld).emit(GameWorld.GREEN_EXPLOSION, tb.x, tb.y, 30);
+				world.remove(tb);
+				timeBonus += 5000;
+			}
+			
 			var xc:Number = Math.cos(dir);
 			xc = ((xc < 0.0001 && xc > 0) ||
 				(xc > -0.0001 && xc < 0)) ? 0 : Math.cos(dir);
@@ -234,7 +267,8 @@ package com.danieltait.ld27.entities
 			}
 		}
 		
-		private function writeShadowData() {
+		private function writeShadowData():void
+		{
 			if(!doingFlashback) {
 				var date:Date = new Date;
 				var timestamp:Number = date.time;
@@ -249,7 +283,7 @@ package com.danieltait.ld27.entities
 			}
 		}
 		
-		private function flashback():void 
+		private function flashback():Boolean
 		{
 			if (canFlashback()) {
 				this.shadow.reset();
@@ -257,7 +291,11 @@ package com.danieltait.ld27.entities
 				updateFlashback();
 				var date:Date = new Date;
 				flashBackTime = date.time;
+				AudioManager.getInstance().fadeTo("Song", 0.1, 0.5);
+				AudioManager.getInstance().loopSound("Flashback");
+				return true;
 			}
+			return false;
 		}
 		
 		public function canFlashback():Boolean
@@ -276,6 +314,9 @@ package com.danieltait.ld27.entities
 				flashBackFrameIndex = 0;
 				flashbackFrames = null;
 				doingFlashback = false;
+				timeBonus = 0;
+				AudioManager.getInstance().fadeTo("Song", 0.5, 0.5);
+				AudioManager.getInstance().stopSound("Flashback");
 			}
 		}
 		

@@ -1,9 +1,11 @@
 package com.danieltait.ld27 
 {
 	import com.danieltait.ld27.entities.Enemy;
+	import com.danieltait.ld27.entities.FlashbackPoint;
 	import com.danieltait.ld27.entities.Level;
 	import com.danieltait.ld27.entities.Player;
 	import com.danieltait.ld27.entities.ShadowPlayer;
+	import com.danieltait.ld27.entities.TimeBonus;
 	import com.danieltait.ld27.worlds.GameWorld;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -60,6 +62,24 @@ package com.danieltait.ld27
 				enemy.x = xml.Entities.Enemy[i].@x;
 				enemy.y = xml.Entities.Enemy[i].@y;
 				enemy.renderTarget = world.bitmapTest;
+			}
+			
+			for (var i:int = 0; i < xml.Entities.FlashbackPoint.length(); i++) {
+				var fbp:FlashbackPoint = new FlashbackPoint();
+				world.add(fbp);
+				fbp.x = xml.Entities.FlashbackPoint[i].@x;
+				fbp.y = xml.Entities.FlashbackPoint[i].@y;
+				fbp.renderTarget = world.bitmapTest;
+				fbp.layer = 20;
+			}
+			
+			for (var i:int = 0; i < xml.Entities.TimeBonus.length(); i++) {
+				var tb:TimeBonus = new TimeBonus();
+				world.add(tb);
+				tb.x = xml.Entities.TimeBonus[i].@x;
+				tb.y = xml.Entities.TimeBonus[i].@y;
+				tb.renderTarget = world.bitmapTest;
+				tb.layer = 20;
 			}
 			
 			

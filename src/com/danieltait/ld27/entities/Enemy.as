@@ -62,14 +62,9 @@ package com.danieltait.ld27.entities
 		
 		override public function update():void
 		{
-			if (this.health <= 0) {
-				world.remove(this);
-			}
-			else {
-				moveToPlayer();
-				handleImpulse();
-				handleCollisions();
-			}
+			moveToPlayer();
+			handleImpulse();
+			handleCollisions();
 		}
 		
 		override public function hit(b:Bullet):void 
@@ -77,6 +72,11 @@ package com.danieltait.ld27.entities
 			super.hit(b);
 			impulse.x += b.xVel * b.force;
 			impulse.y += b.yVel * b.force;
+		}
+		
+		override protected function die():void
+		{
+			world.remove(this);
 		}
 		
 		private function moveToPlayer():void
