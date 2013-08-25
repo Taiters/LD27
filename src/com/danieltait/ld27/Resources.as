@@ -18,11 +18,15 @@ package com.danieltait.ld27
 			[Embed(source = "../../../assets/audio/fx/playerdie.mp3")] public static const PLAYER_DIE:Class;
 			[Embed(source = "../../../assets/audio/fx/shoot.mp3")] public static const SHOOT:Class;
 			[Embed(source = "../../../assets/audio/fx/hit.mp3")] public static const HIT:Class;
-			[Embed(source = "../../../assets/audio/fx/music.mp3")] public static const MUSIC:Class;
 			[Embed(source = "../../../assets/audio/fx/flashback.mp3")] public static const FLASHBACK:Class;
+			
+			[Embed(source = "../../../assets/audio/music/song.mp3")] public static const SONG:Class;
 		
 			[Embed(source = "../../../assets/levels/level_1.oel", mimeType = "application/octet-stream")] public static const LEVEL_1:Class;
 			[Embed(source = "../../../assets/levels/level_2.oel", mimeType = "application/octet-stream")] public static const LEVEL_2:Class;
+			[Embed(source = "../../../assets/levels/level_3.oel", mimeType = "application/octet-stream")] public static const LEVEL_3:Class;
+			[Embed(source = "../../../assets/levels/level_4.oel", mimeType = "application/octet-stream")] public static const LEVEL_4:Class;
+			
 		
 	}
 

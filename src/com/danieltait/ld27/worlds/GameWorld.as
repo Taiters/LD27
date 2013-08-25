@@ -74,12 +74,6 @@ package com .danieltait.ld27.worlds
 			
 			vignette = new Image(Resources.VIGNETTE);
 			AudioManager.getInstance().setWorld(this);
-			AudioManager.getInstance().addSound("Shot", new Sfx(Resources.SHOOT))
-				.addSound("Hit", new Sfx(Resources.HIT))
-				.addSound("Song", new Sfx(Resources.MUSIC))
-				.addSound("Flashback", new Sfx(Resources.FLASHBACK))
-				.addSound("PlayerDie", new Sfx(Resources.PLAYER_DIE))
-				.loopSound("Song", 0.5);
 				
 			
 			var image:Bitmap = new Resources.FONT16();
@@ -100,7 +94,6 @@ package com .danieltait.ld27.worlds
 					this.remove(player);
 					loose = true;
 					AudioManager.getInstance().playSound("PlayerDie");
-					AudioManager.getInstance().fadeTo("Song", 0, 2);
 				}
 			}
 			

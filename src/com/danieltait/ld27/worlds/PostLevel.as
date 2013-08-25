@@ -25,8 +25,8 @@ package com.danieltait.ld27.worlds
 		public static const MAIN_MENU:String = "Main menu";
 		
 		public static const YOU_LOST:String = "you lost";
-		public static const MESSAGE_LOOSE_1:String = "Press replay";
-		public static const MESSAGE_LOOSE_2:String = "to play again";
+		public static const MESSAGE_LOOSE_1:String = "Try again";
+		public static const MESSAGE_LOOSE_2:String = " ";
 		
 		public static const YOU_WIN:String = "you won";
 		public static const MESSAGE_WIN_1:String = "YOU SCORED";
@@ -45,7 +45,7 @@ package com.danieltait.ld27.worlds
 			var image32:Bitmap = new Resources.FONT32();
 			spritefont32 = new SpriteFont(image32.bitmapData.clone(), 8, 8, 32);
 			
-			var replayButton:Option = new Option(REPLAY, spritefont32, FP.halfWidth - (REPLAY.length / 2) * 32, 430, function():void {
+			var replayButton:Option = new Option(REPLAY, spritefont32, FP.halfWidth - (REPLAY.length / 2) * 32, 390, function():void {
 				var lvl:Class = LevelManager.getInstance().getCurrentLevel();
 				var index:int = LevelManager.getInstance().getCurrentLevelIndex();
 				FP.world = new GameWorld(lvl, index);
@@ -53,21 +53,24 @@ package com.danieltait.ld27.worlds
 			
 			add(replayButton);
 			
+			var mainButton:Option = new Option(MAIN_MENU, spritefont32, FP.halfWidth - (MAIN_MENU.length / 2) * 32, 430, function():void {
+				FP.world = new MainMenu;
+			});
+			
+			add(mainButton);
+			
 			if (win) {
-				var nextButton:Option;
+				
 				if (LevelManager.getInstance().hasNextLevel()) {
-					nextButton = new Option(NEXT_LEVEL, spritefont32, FP.halfWidth - (NEXT_LEVEL.length / 2) * 32, 390, function():void {
+					var nextButton:Option = new Option(NEXT_LEVEL, spritefont32, FP.halfWidth - (NEXT_LEVEL.length / 2) * 32, 350, function():void {
 						var lvl:Class = LevelManager.getInstance().getNextLevel();
 						var index:int = LevelManager.getInstance().getCurrentLevelIndex();
 						FP.world = new GameWorld(lvl, index);
 					});
+					
+					add(nextButton);
 				}
-				else {
-					nextButton = new Option(MAIN_MENU, spritefont32, FP.halfWidth - (MAIN_MENU.length / 2) * 32, 390, function():void {
-						FP.world = new MainMenu;
-					});
-				}
-				add(nextButton);
+				
 				
 			}
 			

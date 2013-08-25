@@ -16,6 +16,8 @@ package com.danieltait.ld27
 			levels = [];
 			levels.push(Resources.LEVEL_1);
 			levels.push(Resources.LEVEL_2);
+			levels.push(Resources.LEVEL_3);
+			levels.push(Resources.LEVEL_4);
 			currentLevel = -1;
 		}
 		

@@ -324,8 +324,7 @@ package com.danieltait.ld27.entities
 				var flashbacks:Array = [];
 				world.getType("FlashbackPoint", flashbacks);
 				if (flashbacks.length == 0) {
-					(world as GameWorld).win = true;
-					AudioManager.getInstance().fadeTo("Song", 0, 2);
+					(world as GameWorld).win = true;;
 				}
 				this.image.alpha = 1;
 			}
