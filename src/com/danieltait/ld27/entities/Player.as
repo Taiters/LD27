@@ -6,6 +6,7 @@ package com.danieltait.ld27.entities
 	import net.flashpunk.graphics.Canvas;
 	import net.flashpunk.graphics.Image;
 	import net.flashpunk.Sfx;
+	import net.flashpunk.tweens.misc.VarTween;
 	import net.flashpunk.utils.Input;
 	import net.flashpunk.utils.Key;
 	import net.flashpunk.FP;
@@ -286,13 +287,15 @@ package com.danieltait.ld27.entities
 		private function flashback():Boolean
 		{
 			if (canFlashback()) {
-				this.shadow.reset();
 				doingFlashback = true;
 				updateFlashback();
 				var date:Date = new Date;
 				flashBackTime = date.time;
 				AudioManager.getInstance().fadeTo("Song", 0.1, 0.5);
 				AudioManager.getInstance().loopSound("Flashback");
+				var tween:VarTween = new VarTween();
+				tween.tween(image, "alpha", 0.25, 0.5);
+				world.addTween(tween);
 				return true;
 			}
 			return false;
@@ -317,6 +320,14 @@ package com.danieltait.ld27.entities
 				timeBonus = 0;
 				AudioManager.getInstance().fadeTo("Song", 0.5, 0.5);
 				AudioManager.getInstance().stopSound("Flashback");
+				shadow.reset();
+				var flashbacks:Array = [];
+				world.getType("FlashbackPoint", flashbacks);
+				if (flashbacks.length == 0) {
+					(world as GameWorld).win = true;
+					AudioManager.getInstance().fadeTo("Song", 0, 2);
+				}
+				this.image.alpha = 1;
 			}
 		}
 		

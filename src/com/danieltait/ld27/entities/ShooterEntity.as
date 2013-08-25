@@ -19,8 +19,8 @@ package com.danieltait.ld27.entities
 		{
 			var direction:Number = this.getAngle();
 			var rDirection:Number = -(direction +90) * (Math.PI / 180);
-			var spawnX:Number = x + (Math.cos(rDirection) * 30);
-			var spawnY:Number = y + (Math.sin(rDirection) * 30);
+			var spawnX:Number = x + (Math.cos(rDirection) * 15);
+			var spawnY:Number = y + (Math.sin(rDirection) * 15);
 			var bullet:Bullet = new Bullet(spawnX, spawnY, 400, direction, rDirection, this);
 			FP.world.add(bullet);
 			bullet.renderTarget = (world as GameWorld).bitmapTest;

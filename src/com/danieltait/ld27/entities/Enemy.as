@@ -82,20 +82,26 @@ package com.danieltait.ld27.entities
 		private function moveToPlayer():void
 		{
 			var player:Player = world.getInstance("Player");
-			
-			var xd:Number = player.x - this.x;
-			var yd:Number = player.y - this.y;
-			
-			if (Math.sqrt(Math.pow(xd, 2) + Math.pow(yd, 2)) < ATTACK_DIST) {
-				dir = Math.atan2(yd, xd);
+			if(player && !player.isInFlashback()) {
+				var xd:Number = player.x - this.x;
+				var yd:Number = player.y - this.y;
 				
-				this.image.angle = -dir * (180 / Math.PI) - 90;
-				
-				vel += acc;
-				
-				vel = (vel > MOVE_SPEED) ? MOVE_SPEED : (vel < -MOVE_SPEED) ? -MOVE_SPEED : vel;
-				
-				chasing = true;
+				if (Math.sqrt(Math.pow(xd, 2) + Math.pow(yd, 2)) < ATTACK_DIST) {
+					dir = Math.atan2(yd, xd);
+					
+					this.image.angle = -dir * (180 / Math.PI) - 90;
+					
+					vel += acc;
+					
+					vel = (vel > MOVE_SPEED) ? MOVE_SPEED : (vel < -MOVE_SPEED) ? -MOVE_SPEED : vel;
+					
+					chasing = true;
+				}
+				else {
+					vel = 0;
+					
+					chasing = false;
+				}
 			}
 			else {
 				vel = 0;

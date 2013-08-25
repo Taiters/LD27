@@ -62,7 +62,7 @@ package com.danieltait.ld27.entities
 		{
 			var e:Entity;
 			if (collide("Map", x, y)) {
-				(world as GameWorld).emit(GameWorld.EXPLOSION, this.x, this.y);
+				(world as GameWorld).emit(GameWorld.GREEN_EXPLOSION, this.x, this.y);
 				explode();
 			}
 			else if ((e = collide("Enemy", x, y))) {

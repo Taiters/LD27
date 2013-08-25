@@ -10,6 +10,7 @@ package com .danieltait.ld27.worlds
 	import com.danieltait.ld27.Resources;
 	import com.danieltait.ld27.LevelBuilder;
 	import com.danieltait.ld27.AudioManager;
+	import com.danieltait.ld27.SpriteFont;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.filters.GlowFilter;
@@ -34,16 +35,27 @@ package com .danieltait.ld27.worlds
 		public static const EXPLOSION:String = "explosion";
 		public static const GREEN_EXPLOSION:String = "green_explosion";
 		public static const BLOOD:String = "blood";
+		public static const END_PAUSE:int = 2;
+		
+		public var win:Boolean = false;
+		public var loose:Boolean = false;
 		
 		protected var emitter:Emitter;
 		
 		private var vignette:Image;
 		
+		private var spritefont:SpriteFont;
+		
 		public var bitmapTest:BitmapData;
 		
-		public function GameWorld() 
+		private var endPauseTimer:Number = 0;
+		
+		private var levelindex:int;
+		
+		public function GameWorld(leveldata:Class, levelindex:int) 
 		{
-			level = LevelBuilder.buildLevel(Resources.TEST_LEVEL, this);
+			this.levelindex = levelindex;
+			level = LevelBuilder.buildLevel(leveldata, this);
 			
 			emitter = new Emitter(Resources.PARTICLE, 5, 5);
 			emitter.relative = false;
@@ -66,7 +78,12 @@ package com .danieltait.ld27.worlds
 				.addSound("Hit", new Sfx(Resources.HIT))
 				.addSound("Song", new Sfx(Resources.MUSIC))
 				.addSound("Flashback", new Sfx(Resources.FLASHBACK))
-				.playSound("Song", 0.5);
+				.addSound("PlayerDie", new Sfx(Resources.PLAYER_DIE))
+				.loopSound("Song", 0.5);
+				
+			
+			var image:Bitmap = new Resources.FONT16();
+			spritefont = new SpriteFont(image.bitmapData.clone(), 8, 8, 16);
 		}
 		
 		override public function update():void 
@@ -74,6 +91,29 @@ package com .danieltait.ld27.worlds
 			super.update();
 			level.getCamera().update();
 			emitter.update();
+			
+			var player:Player = this.getInstance("Player") as Player;
+			if (player && !player.isInFlashback() && !win) {
+				if (Math.floor(player.getHistoryTime() / 1000) >= 10)
+				{
+					emit(EXPLOSION, player.x, player.y, 40);
+					this.remove(player);
+					loose = true;
+					AudioManager.getInstance().playSound("PlayerDie");
+					AudioManager.getInstance().fadeTo("Song", 0, 2);
+				}
+			}
+			
+			if (win || loose) {
+				endPauseTimer += FP.elapsed;
+				if (endPauseTimer > END_PAUSE) {
+					var score:int = 0;
+					if (player) {
+						score = player.getScore();
+					}
+					FP.world = new PostLevel(score, win);
+				}
+			}
 		}
 		
 		override public function render():void
@@ -88,17 +128,35 @@ package com .danieltait.ld27.worlds
 			
 			render_markers();
 			var player:Player = this.getInstance("Player") as Player;
-			if (player.isInFlashback()) {
-				var alpha:Number = player.getFlashbackTimeTaken() / 10000;
-				vignette.alpha = alpha;
-				Draw.graphic(vignette, FP.camera.x, FP.camera.y);
-				Draw.text("" + Math.floor(((player.getFlashbackTime() - player.getStartTime()) / 1000) - (player.getFlashbackTimeTaken() / 1000)), FP.camera.x + 40, FP.camera.y + 40);
-				
+			if(player) {
+				if (player.isInFlashback()) {
+					render_flashback(player);
+				}
+				else {
+					render_remaining(player);
+				}
+				render_score(player);
 			}
-			else {
-				Draw.text(""+Math.floor(player.getHistoryTime()/1000), FP.camera.x + 40, FP.camera.y + 40);
-			}
-			Draw.text("SCORE: " + player.getScore(), FP.camera.x + 40, FP.camera.y + 60);
+		}
+		
+		private function render_score(player:Player):void
+		{
+			spritefont.write("Score " + player.getScore(), FP.buffer, 10, 50);
+		}
+		
+		private function render_remaining(player:Player):void
+		{
+			spritefont.write("Remaining " + (10-Math.floor(player.getHistoryTime() / 1000)), FP.buffer,
+				10, 10);
+		}
+		
+		private function render_flashback(player:Player):void
+		{
+			var alpha:Number = player.getFlashbackTimeTaken() / 10000;
+			vignette.alpha = alpha;
+			Draw.graphic(vignette, FP.camera.x, FP.camera.y);
+			spritefont.write("Remaining: " + (10-Math.floor(((player.getFlashbackTime() - player.getStartTime()) / 1000) - (player.getFlashbackTimeTaken() / 1000))),
+				FP.buffer, 10, 10);
 		}
 		
 		private function render_markers():void 
@@ -116,8 +174,6 @@ package com .danieltait.ld27.worlds
 					
 					var xPos:Number = Math.cos(dir) * FP.halfWidth;
 					var yPos:Number = Math.sin(dir) * FP.halfHeight;
-					
-					trace(xPos+ " " +yPos);
 					
 					var img:Image = new Image(Resources.MARKER);
 					img.centerOO();

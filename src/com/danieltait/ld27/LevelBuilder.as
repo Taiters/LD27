@@ -28,17 +28,19 @@ package com.danieltait.ld27
 			var bytes:ByteArray = new levelFile;
 			var xml:XML = new XML(bytes.readUTFBytes(bytes.length));
 			
+			var color:uint = xml.@color;
+			
 			var bitmap:BitmapData = new BitmapData(xml.@width, xml.@height, true, 0x00000000);
 			Draw.setTarget(bitmap);
 			
 			for (var i:int = 0; i < xml.Bounds.Nodes.length(); i++) {
-				drawNodeSet(xml.Bounds.Nodes[i].node);
+				drawNodeSet(xml.Bounds.Nodes[i].node, uint(color));
 			}
-			bitmap.floodFill(0, 0, 0xFF8570FF);
+			bitmap.floodFill(0, 0, uint(color));
 			
 			for (var i:int = 0; i < xml.Bounds.Fill.length(); i++) {
 				var fill:XML = xml.Bounds.Fill[i];
-				fillRegion(fill.@x, fill.@y, 0xFF8570FF, bitmap);
+				fillRegion(fill.@x, fill.@y, uint(color), bitmap);
 			}
 			
 			var level:Level = new Level(bitmap);
@@ -94,13 +96,13 @@ package com.danieltait.ld27
 			
 		}
 		
-		private static function drawNodeSet(nodes:XMLList):void
+		private static function drawNodeSet(nodes:XMLList, col:uint):void
 		{
 			for ( var i:int = 0; i < nodes.length() - 1; i++) {
 				var node1:XML = nodes[i];
 				var node2:XML = nodes[i + 1];
 				
-				Draw.line(node1.@x, node1.@y, node2.@x, node2.@y, 0x8570FF);
+				Draw.line(node1.@x, node1.@y, node2.@x, node2.@y, col);
 				
 			}
 			
