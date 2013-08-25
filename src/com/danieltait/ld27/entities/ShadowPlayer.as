@@ -38,6 +38,7 @@ package com.danieltait.ld27.entities
 			dataQueue.reset();
 			this.exists = false;
 			this.visible = false;
+			this.currentFrame = null;
 		}
 		
 		public function getFrame():PlayerData

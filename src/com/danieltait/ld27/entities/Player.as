@@ -2,6 +2,7 @@ package com.danieltait.ld27.entities
 {
 	import com.danieltait.ld27.PlayerData;
 	import net.flashpunk.Entity;
+	import net.flashpunk.graphics.Canvas;
 	import net.flashpunk.graphics.Image;
 	import net.flashpunk.utils.Input;
 	import net.flashpunk.utils.Key;
@@ -11,10 +12,13 @@ package com.danieltait.ld27.entities
 	
 	public class Player extends ShooterEntity
 	{
-		private var xVel:Number = 0;
-		private var yVel:Number = 0;
+		
+		public static const MOVE_SPEED:int = 300;
+		
 		private var acc:Number = 50;
-		private var maxSpeed:Number = 300;
+		
+		private var vel:Number;
+		private var dir:Number;
 		
 		private var image:Image;
 		
@@ -31,6 +35,7 @@ package com.danieltait.ld27.entities
 		{
 			image = new Image(Resources.PLAYER);
 			image.centerOO();
+			
 			this.graphic = image;
 			
 			this.setHitbox(image.width, image.height);
@@ -46,6 +51,9 @@ package com.danieltait.ld27.entities
 			this.shadow = shadow;
 			
 			this.fireRate = 0.25
+			
+			this.vel = 0;
+			this.dir = 0;
 		}
 		
 		override public function render():void
@@ -85,7 +93,8 @@ package com.danieltait.ld27.entities
 			return null;
 		}
 		
-		private function handleInput() {
+		private function handleInput():void
+		{
 			
 			if (Input.pressed("Flashback")) {
 				if (flashback()) {
@@ -100,58 +109,68 @@ package com.danieltait.ld27.entities
 				this.shadow.setExists(false);
 			}
 			
+			var xVel:Number = Math.cos(dir) * vel;
+			var yVel:Number = Math.sin(dir) * vel;
+			
 			if (Input.check("Up")) {
-				this.yVel -= acc;
+				yVel -= acc;
 			}
 			else if (Input.check("Down")) {
-				this.yVel += acc;
+				yVel += acc;
 			}
 			else {
-				if (this.yVel > 0) {
-					this.yVel -= acc;
-					if (this.yVel < 0) {
-						this.yVel = 0;
+				if (yVel > 0) {
+					yVel -= acc;
+					if (yVel < 0) {
+						yVel = 0;
 					}
 				}
-				else if (this.yVel < 0) {
-					this.yVel += acc;
-					if (this.yVel > 0) {
-						this.yVel = 0;
+				else if (yVel < 0) {
+					yVel += acc;
+					if (yVel > 0) {
+						yVel = 0;
 					}
 				}
 			}
 			if (Input.check("Left")) {
-				this.xVel -= acc;
+				xVel -= acc;
 			}
 			else if (Input.check("Right")) {
-				this.xVel += acc;
+				xVel += acc;
 			}
 			else {
-				if (this.xVel > 0) {
-					this.xVel -= acc;
-					if (this.xVel < 0) {
-						this.xVel = 0;
+				if (xVel > 0) {
+					xVel -= acc;
+					if (xVel < 0) {
+						xVel = 0;
 					}
 				}
-				else if (this.xVel < 0) {
-					this.xVel += acc;
-					if (this.xVel > 0) {
-						this.xVel = 0;
+				else if (xVel < 0) {
+					xVel += acc;
+					if (xVel > 0) {
+						xVel = 0;
 					}
 				}
 			}
 			
-			xVel = (xVel > maxSpeed) ? maxSpeed : (xVel < -maxSpeed) ? -maxSpeed : xVel;
-			yVel = (yVel > maxSpeed) ? maxSpeed : (yVel < -maxSpeed) ? -maxSpeed : yVel;
-			
+			vel = Math.sqrt(Math.pow(xVel, 2) + Math.pow(yVel, 2));
+			dir = Math.atan2(yVel, xVel);
+			vel = (vel > MOVE_SPEED) ? MOVE_SPEED : (vel < -MOVE_SPEED) ? -MOVE_SPEED : vel;
 			
 		}
 		
 		private function handleCollisions():void 
 		{
-			var xd:Number = xVel * FP.elapsed;
-			var yd:Number = yVel * FP.elapsed;
+			var xc:Number = Math.cos(dir);
+			xc = ((xc < 0.0001 && xc > 0) ||
+				(xc > -0.0001 && xc < 0)) ? 0 : Math.cos(dir);
+				
+			var yc:Number = Math.sin(dir);
+			yc = ((yc < 0.0001 && yc > 0) ||
+				(yc > -0.0001 && yc < 0)) ? 0 : Math.sin(dir);
 			
+			var xd:Number = xc * vel * FP.elapsed;
+			var yd:Number = yc * vel * FP.elapsed;
 			
 			for ( var i:int = 0; i < Math.abs(xd); i++) {
 				var sxd:int = FP.sign(xd);
@@ -232,14 +251,19 @@ package com.danieltait.ld27.entities
 		
 		private function flashback():void 
 		{
-			flashbackFrames = this.shadow.getFlashbackFrames();
-			if (flashbackFrames) {
+			if (canFlashback()) {
 				this.shadow.reset();
 				doingFlashback = true;
 				updateFlashback();
 				var date:Date = new Date;
 				flashBackTime = date.time;
 			}
+		}
+		
+		public function canFlashback():Boolean
+		{
+			return (flashbackFrames = this.shadow.getFlashbackFrames())
+				? true : false;
 		}
 		
 		private function updateFlashback():void

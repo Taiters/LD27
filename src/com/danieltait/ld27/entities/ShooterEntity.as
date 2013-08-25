@@ -20,6 +20,7 @@ package com.danieltait.ld27.entities
 			var spawnY:Number = y + (Math.sin(rDirection) * 30);
 			var bullet:Bullet = new Bullet(spawnX, spawnY, 400, direction, rDirection, this);
 			FP.world.add(bullet);
+			bullet.renderTarget = (world as GameWorld).bitmapTest;
 			lastFire = 0;
 		}
 		

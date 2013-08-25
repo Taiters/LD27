@@ -8,7 +8,9 @@ package com .danieltait.ld27.worlds
 	import com.danieltait.ld27.Queue;
 	import com.danieltait.ld27.Resources;
 	import com.danieltait.ld27.LevelBuilder;
+	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.filters.GlowFilter;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import net.flashpunk.Entity;
@@ -33,6 +35,8 @@ package com .danieltait.ld27.worlds
 		
 		private var vignette:Image;
 		
+		public var bitmapTest:BitmapData;
+		
 		public function GameWorld() 
 		{
 			level = LevelBuilder.buildLevel(Resources.TEST_LEVEL, this);
@@ -49,8 +53,6 @@ package com .danieltait.ld27.worlds
 			emitter.setMotion(BLOOD, 0, 50, 0.2, 360, 25, 0.2);
 			emitter.setColor(BLOOD, 0xFFFF448F, 0xFFFF448F);
 			
-			addGraphic(emitter);
-			
 			vignette = new Image(Resources.VIGNETTE);
 		}
 		
@@ -58,18 +60,28 @@ package com .danieltait.ld27.worlds
 		{
 			super.update();
 			level.getCamera().update();
+			emitter.update();
 		}
 		
 		override public function render():void
 		{
 			super.render();
+			var test:Canvas = new Canvas(FP.width, FP.height);
+			emitter.render(bitmapTest, new Point(0, 0), FP.camera);
+			test.copyPixels(bitmapTest, new Rectangle(0, 0, FP.width, FP.height), new Point(0, 0));
+			bitmapTest.fillRect(new Rectangle(0, 0, bitmapTest.width, bitmapTest.height), 0x00000000);
+			test.applyFilter(new GlowFilter(0xFFFFFF,0.75,8,8,1));
+			test.render(FP.buffer, new Point(0, 0), new Point(0,0));
 			var player:Player = this.getInstance("Player") as Player;
 			if (player.isInFlashback()) {
 				var alpha:Number = player.getFlashbackTime() / 10000;
 				trace(alpha);
 				vignette.alpha = alpha;
 				Draw.graphic(vignette, FP.camera.x, FP.camera.y);
-				Draw.text("REWIND: "+ (10 - Math.floor(player.getFlashbackTime() / 1000)), FP.camera.x + 40, FP.camera.y + 40);
+				Draw.text("-"+ (Math.floor(player.getFlashbackTime() / 1000)), FP.camera.x + 40, FP.camera.y + 40);
+			}
+			else if (player.canFlashback()) {
+				Draw.text("FLASHBACK AVAILABLE", FP.camera.x + 40, FP.camera.y + 40);
 			}
 		}
 		

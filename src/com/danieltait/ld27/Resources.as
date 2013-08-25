@@ -4,6 +4,7 @@ package com.danieltait.ld27
 	public class Resources 
 	{
 			[Embed(source = "../../../assets/img/player.png")]   public static const PLAYER:Class;
+			[Embed(source = "../../../assets/img/enemy.png")]    public static const ENEMY:Class;
 			[Embed(source = "../../../assets/img/bullet.png")]   public static const BULLET:Class;
 			[Embed(source = "../../../assets/img/vignette.png")] public static const VIGNETTE:Class;
 			[Embed(source = "../../../assets/img/particle.png")] public static const PARTICLE:Class;

@@ -15,15 +15,17 @@ package com.danieltait.ld27.entities
 		
 		private var damage:int;
 		
-		private var xVel:Number;
-		private var yVel:Number;
-		private var direction:Number;
-		
 		private var shotBy:ShooterEntity;
 		
-		public function Bullet(x:Number, y:Number, vel:Number, direction:Number, rDirection:Number, shotBy:ShooterEntity, damage:int = 34) 
+		
+		public var xVel:Number;
+		public var yVel:Number;
+		public var force:int;
+		
+		public function Bullet(x:Number, y:Number, vel:Number, direction:Number, rDirection:Number, shotBy:ShooterEntity, damage:int = 34, force:int = 2) 
 		{
-			this.image = new Image(Resources.BULLET);
+			this.image = new Image(Resources.PARTICLE);
+			this.image.color = 0x35FF75;
 			this.image.centerOO();
 			this.graphic = image;
 			this.setHitbox(image.width, image.height);
@@ -36,6 +38,7 @@ package com.danieltait.ld27.entities
 			this.image.angle = direction;
 			this.damage = damage;
 			this.shotBy = shotBy;
+			this.force = force;
 		}
 		
 		override public function update():void 

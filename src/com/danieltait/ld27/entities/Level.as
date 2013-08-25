@@ -2,8 +2,10 @@ package com.danieltait.ld27.entities
 {
 	import com.danieltait.ld27.EntityTrackingCamera;
 	import flash.display.BitmapData;
+	import flash.filters.BlurFilter;
 	import flash.filters.GlowFilter;
 	import flash.filters.BitmapFilterQuality;
+	import flash.filters.ShaderFilter;
 	import flash.media.Camera;
 	import net.flashpunk.graphics.Canvas;
 	import net.flashpunk.Entity;
@@ -20,7 +22,7 @@ package com.danieltait.ld27.entities
 		{
 			var canvas:Canvas = new Canvas(data.width, data.height);
 			canvas.draw(0, 0, data);
-			//canvas.applyFilter(new GlowFilter(0x8570FF, 1, 8, 8,2,BitmapFilterQuality.HIGH,false,false));
+			canvas.applyFilter(new GlowFilter(0xCB9EFF, 1, 8, 8, 1, BitmapFilterQuality.HIGH, false, false));
 			this.graphic = canvas;
 			this.mask = new Pixelmask(data);
 			this.type = "Map";

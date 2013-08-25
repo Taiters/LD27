@@ -39,23 +39,27 @@ package com.danieltait.ld27
 				fillRegion(fill.@x, fill.@y, 0xFF8570FF, bitmap);
 			}
 			
-			
+			var level:Level = new Level(bitmap);
+			world.bitmapTest = new BitmapData(level.width, level.height, true, 0x00000000);
 			
 			var shadow:ShadowPlayer = new ShadowPlayer;
 			var player:Player = new Player(shadow);
 			world.add(player);
 			world.add(shadow);
 			
+			shadow.renderTarget = world.bitmapTest;
+			player.renderTarget = world.bitmapTest;
+			
 			player.x = xml.Entities.Player.@x;
 			player.y = xml.Entities.Player.@y;
 			
-			var level:Level = new Level(bitmap);
 			
 			for (var i:int = 0; i < xml.Entities.Enemy.length(); i++) {
 				var enemy:Enemy = new Enemy();
 				world.add(enemy);
 				enemy.x = xml.Entities.Enemy[i].@x;
 				enemy.y = xml.Entities.Enemy[i].@y;
+				enemy.renderTarget = world.bitmapTest;
 			}
 			
 			
@@ -64,6 +68,8 @@ package com.danieltait.ld27
 			level.setCamera(trackingCamera);
 			
 			Draw.resetTarget();
+			
+			
 			return level;
 			
 		}
